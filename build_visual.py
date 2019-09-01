@@ -15,10 +15,13 @@ TOOLTIPS = [
     ("Named after", "@namesakeLabel"),
 ]
 
-p = figure(plot_width=800, plot_height=800, title="Magnitude vs Fame",
-           toolbar_location=None, tools="", x_axis_type="log", tooltips=TOOLTIPS)
+p = figure(plot_width=800, plot_height=750, title='Magnitude vs Fame',
+           toolbar_location='right', tools='box_zoom, tap, box_select, lasso_select, reset', x_axis_type="log", tooltips=TOOLTIPS)
 
-c = p.circle(x='wikiEdits', y='avgMagnitude', size=5, alpha=0.6, source=ds)
+c = p.circle(x='wikiEdits', y='avgMagnitude', size=5, alpha=0.8, source=ds)
+p.y_range.flipped = True
+p.xaxis[0].axis_label = 'Total number of edits on the Wikipedia article of the namesake of the spacerock'
+p.yaxis[0].axis_label = 'Absolute magnitude of the piece of spacerock'
 
 opts = list(set(ds.data['namesakeLabel']))
 
@@ -65,7 +68,7 @@ gender_plot = figure(
     plot_width=300,
     plot_height=100,
     toolbar_location=None,
-    tools="tap",
+    tools="tap,box_select",
     y_minor_ticks=len(counts.data['namesakeGender']),
     x_range=[0, 1.2*max(counts.data['spacerockLabel'])],
     y_range = counts.data['namesakeGender'],
@@ -100,6 +103,6 @@ callback_gender_select = CustomJS(args=dict(ds=ds, counts=counts), code="""
         }
     """)
 
-gender_plot.js_on_event('tap', callback_gender_select)
+counts.selected.js_on_change('indices', callback_gender_select)
 
 save(row(column(ti, s, reset_button, div, gender_plot), p))
