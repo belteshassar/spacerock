@@ -1,5 +1,5 @@
 from bokeh.plotting import figure, output_file, save
-from bokeh.models import Select, TextInput, Button, ColumnDataSource, CustomJS
+from bokeh.models import Select, TextInput, Button, ColumnDataSource, CustomJS, LabelSet
 from bokeh.layouts import column, row
 output_file('visual.html')
 
@@ -55,4 +55,35 @@ callback_reset = CustomJS(args=dict(s=s, ti=ti, opts=opts), code="""
 
 reset_button = Button(label="Reset", callback=callback_reset)
 
-save(row(column(ti, s, reset_button), p))
+counts = df[['namesakeGender', 'spacerockLabel']].groupby('namesakeGender').count()
+counts.sort_values('spacerockLabel', inplace=True)
+counts = ColumnDataSource(counts)
+
+gender_plot = figure(
+    title="Number of asteroids by gender",
+    plot_width=300,
+    plot_height=250,
+    toolbar_location=None,
+    tools="tap",
+    y_minor_ticks=len(counts.data['namesakeGender']),
+    x_range=[0, 1.2*max(counts.data['spacerockLabel'])],
+    y_range = counts.data['namesakeGender'],
+    )
+
+gender_plot.xaxis.visible = False
+gender_plot.xgrid.visible = False
+gender_plot.ygrid.visible = False
+
+labels = LabelSet(x='spacerockLabel', y='namesakeGender', text='spacerockLabel', level='glyph',
+        x_offset=2, text_baseline='middle', text_font_size="10px", source=counts)
+
+gender_plot.hbar(
+    y='namesakeGender',
+    height=0.5, left=0,
+    right='spacerockLabel',
+    source=counts,
+)
+
+gender_plot.add_layout(labels)
+
+save(row(column(ti, s, reset_button, gender_plot), p))
