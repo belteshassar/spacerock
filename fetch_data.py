@@ -3,13 +3,16 @@ import pandas as pd
 
 URL = 'https://query.wikidata.org/sparql'
 QUERY = """
-SELECT ?spacerock ?spacerockLabel (AVG(?magnitude) AS ?avgMagnitude) ?namesake ?namesakeLabel ?articleName
+SELECT ?spacerock ?spacerockLabel (AVG(?magnitude) AS ?avgMagnitude) ?namesake ?namesakeLabel ?genderLabel ?articleName
 WHERE
 {
   ?spacerock wdt:P138 ?namesake.
   ?namesake wdt:P31 wd:Q5.
   ?spacerock wdt:P31 wd:Q3863.
   ?spacerock wdt:P1457 ?magnitude.
+  OPTIONAL {
+      ?namesake wdt:P21 ?gender.
+  }
   OPTIONAL {
       ?article schema:about ?namesake .
       ?article schema:inLanguage "en" .
@@ -19,7 +22,7 @@ WHERE
   BIND(SUBSTR(str(?article), 31) as ?articleName).
   SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
 }
-GROUP BY ?spacerock ?spacerockLabel ?namesake ?namesakeLabel ?articleName
+GROUP BY ?spacerock ?spacerockLabel ?namesake ?namesakeLabel ?genderLabel ?articleName
 """
 
 edit_counts = pd.read_csv('edit_counts.csv', index_col=0)
@@ -50,6 +53,8 @@ def query_wikidata():
             'avgMagnitude': item['avgMagnitude']['value'],
             'namesake': item['namesake']['value'],
             'namesakeLabel': item['namesakeLabel']['value'],
+            'namesakeGender': item['genderLabel']['value']
+                if 'genderLabel' in item else None,
             'articleName': item['articleName']['value']
                 if 'articleName' in item else None,
         })
