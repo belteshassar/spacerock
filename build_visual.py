@@ -20,24 +20,28 @@ p = figure(plot_width=800, plot_height=800, title="Magnitude vs Fame",
 
 c = p.circle(x='wikiEdits', y='avgMagnitude', size=5, alpha=0.6, source=ds)
 
+opts = list(set(ds.data['namesakeLabel']))
+
 callback_select = CustomJS(args=dict(ds=ds), code="""
     var namesakes = ds.data['namesakeLabel'];
-    var ind = namesakes.indexOf(cb_obj.value);
-    ds.selected.indices = [ind];
+    var ind = namesakes
+          .map((n, i) => n === cb_obj.value ? i : -1)
+          .filter(index => index !== -1);;
+    ds.selected.indices = ind;
     """)
 
-s = Select(options=ds.data['namesakeLabel'])
+s = Select(options=opts)
 s.js_on_change('value', callback_select)
 
-callback_ti = CustomJS(args=dict(ds=ds, s=s), code=f"""
-        s.options = ds.data['namesakeLabel']
+callback_ti = CustomJS(args=dict(ds=ds, s=s, opts=opts), code=f"""
+        s.options = opts
             .filter(i => i.toLowerCase().includes(cb_obj.value.toLowerCase()));
         s.value = s.options[0]
         var namesakes = ds.data['namesakeLabel'];
-        console.log(s.value);
-        var ind = namesakes.indexOf(s.value);
-        console.log(ind);
-        ds.selected.indices = [ind];
+        var ind = namesakes
+              .map((n, i) => n === s.value ? i : -1)
+              .filter(index => index !== -1);;
+        ds.selected.indices = ind;
         """)
 
 ti = TextInput(title="Select to view a specific person", placeholder='Enter filter',
