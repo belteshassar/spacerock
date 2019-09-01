@@ -61,6 +61,11 @@ def query_wikidata():
 if __name__ == '__main__':
     df = query_wikidata()
     df.to_csv('data.csv')
-    new_edit_counts = pd.DataFrame({'wikiEdits': df['articleName'].apply(get_num_wiki_edits)})
-    new_edit_counts.index = df['articleName']
+    # Remove duplicates to avoid querying multiple times for the same person
+    # Otto Hahn is an example of a person with more than one asteroid named after them
+    article_names = df['articleName'].drop_duplicates()
+    new_edit_counts = pd.DataFrame({
+        'wikiEdits': article_names.apply(get_num_wiki_edits),
+    })
+    new_edit_counts.index = article_names
     new_edit_counts.to_csv('edit_counts.csv')
