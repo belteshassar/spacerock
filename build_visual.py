@@ -1,5 +1,5 @@
 from bokeh.plotting import figure, output_file, save
-from bokeh.models import Select, TextInput, ColumnDataSource, CustomJS
+from bokeh.models import Select, TextInput, Button, ColumnDataSource, CustomJS
 from bokeh.layouts import column, row
 output_file('visual.html')
 
@@ -30,7 +30,7 @@ callback_select = CustomJS(args=dict(ds=ds), code="""
     ds.selected.indices = ind;
     """)
 
-s = Select(options=opts)
+s = Select(options=['Select person...'] + opts)
 s.js_on_change('value', callback_select)
 
 callback_ti = CustomJS(args=dict(ds=ds, s=s, opts=opts), code=f"""
@@ -46,4 +46,13 @@ callback_ti = CustomJS(args=dict(ds=ds, s=s, opts=opts), code=f"""
 
 ti = TextInput(title="Select to view a specific person", placeholder='Enter filter',
                callback=callback_ti)
-save(row(column(ti, s), p))
+
+callback_reset = CustomJS(args=dict(s=s, ti=ti, opts=opts), code="""
+    ti.value = "";
+    s.options = ['Select person...'].concat(opts);
+    s.value = 'Select person...';
+    """)
+
+reset_button = Button(label="Reset", callback=callback_reset)
+
+save(row(column(ti, s, reset_button), p))
