@@ -1,5 +1,5 @@
 from bokeh.plotting import figure, output_file, save
-from bokeh.models import Select, TextInput, Button, ColumnDataSource, CustomJS, LabelSet
+from bokeh.models import Select, TextInput, Button, ColumnDataSource, CustomJS, LabelSet, Div
 from bokeh.layouts import column, row
 output_file('visual.html')
 
@@ -55,14 +55,15 @@ callback_reset = CustomJS(args=dict(s=s, ti=ti, opts=opts), code="""
 
 reset_button = Button(label="Reset", callback=callback_reset)
 
+div = Div(text="<b>Number of asteroids by gender</b><br /> Click to filter",)
+
 counts = df[['namesakeGender', 'spacerockLabel']].groupby('namesakeGender').count()
 counts.sort_values('spacerockLabel', inplace=True)
 counts = ColumnDataSource(counts)
 
 gender_plot = figure(
-    title="Number of asteroids by gender",
     plot_width=300,
-    plot_height=250,
+    plot_height=100,
     toolbar_location=None,
     tools="tap",
     y_minor_ticks=len(counts.data['namesakeGender']),
@@ -86,4 +87,19 @@ gender_plot.hbar(
 
 gender_plot.add_layout(labels)
 
-save(row(column(ti, s, reset_button, gender_plot), p))
+#Add callback for gender selection
+callback_gender_select = CustomJS(args=dict(ds=ds, counts=counts), code="""
+        var genders = ds.data['namesakeGender'];
+        ds.selected.indices = [];
+        for (var i = 0; i < counts.selected.indices.length; ++i) {
+            var selected_gender = counts.data['namesakeGender'][counts.selected.indices[i]];
+            var ind = genders
+                  .map((n, i) => n === selected_gender ? i : -1)
+                  .filter(index => index !== -1);
+            ds.selected.indices = ds.selected.indices.concat(ind);
+        }
+    """)
+
+gender_plot.js_on_event('tap', callback_gender_select)
+
+save(row(column(ti, s, reset_button, div, gender_plot), p))
