@@ -58,7 +58,7 @@ callback_reset = CustomJS(args=dict(s=s, ti=ti, opts=opts), code="""
 
 reset_button = Button(label="Reset", callback=callback_reset)
 
-div = Div(text="<b>Number of asteroids by gender</b><br /> Click to filter",)
+gender_header = Div(text="<b>Number of asteroids by gender</b><br /> Click to filter",)
 
 counts = df[['namesakeGender', 'spacerockLabel']].groupby('namesakeGender').count()
 counts.sort_values('spacerockLabel', inplace=True)
@@ -105,4 +105,39 @@ callback_gender_select = CustomJS(args=dict(ds=ds, counts=counts), code="""
 
 counts.selected.js_on_change('indices', callback_gender_select)
 
-save(row(column(ti, s, reset_button, div, gender_plot), p))
+details_placeholder = "Select a datapoint to view details."
+details = Div(text=details_placeholder)
+
+callback_datapoint_select = CustomJS(
+    args=dict(ds=ds, details=details, details_placeholder=details_placeholder),
+    code="""
+        var ind = ds.selected.indices;
+        if (ind.length === 1) {
+            var articleName = ds.data['articleName'][ind];
+            console.log('https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=1&explaintext=1&origin=*&titles=' + articleName);
+            fetch('https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=1&explaintext=1&origin=*&titles=' + articleName)
+                .then(function(response) {
+                    return response.json();
+                })
+                .then(function(myJson) {
+                    return myJson['query']['pages'];
+                })
+                .then(function(pages) {
+                    return pages[Object.keys(pages)[0]]['extract'].split('\\n')[0];
+                })
+                .then(function (text) {
+                    var regex = /\\(.*? (is|was)/;
+                    var cleaned_text = text.replace(regex, '$1');
+                    var shortened_text = cleaned_text.substring(0, 500);
+                    shortened_text = shortened_text.substring(0, shortened_text.lastIndexOf('.') + 1);
+                    details.text = shortened_text;
+                });
+        }
+        else {
+            details.text = details_placeholder;
+        }
+    """)
+
+ds.selected.js_on_change('indices', callback_datapoint_select)
+
+save(row(column(ti, s, reset_button, gender_header, gender_plot), p, details))
