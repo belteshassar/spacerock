@@ -15,7 +15,7 @@ TOOLTIPS = [
     ("Named after", "@namesakeLabel"),
 ]
 
-p = figure(plot_width=800, plot_height=750, title='Magnitude vs Fame',
+p = figure(plot_width=750, plot_height=750, title='Magnitude vs Fame',
            toolbar_location='right', tools='box_zoom, tap, box_select, lasso_select, reset', x_axis_type="log", tooltips=TOOLTIPS)
 
 c = p.circle(x='wikiEdits', y='avgMagnitude', size=5, alpha=0.8, source=ds)
@@ -105,7 +105,7 @@ callback_gender_select = CustomJS(args=dict(ds=ds, counts=counts), code="""
 
 counts.selected.js_on_change('indices', callback_gender_select)
 
-details_placeholder = "Select a datapoint to view details."
+details_placeholder = "<p>Select a datapoint to view details.</p>"
 details = Div(text=details_placeholder)
 
 callback_datapoint_select = CustomJS(
@@ -114,7 +114,8 @@ callback_datapoint_select = CustomJS(
         var ind = ds.selected.indices;
         if (ind.length === 1) {
             var articleName = ds.data['articleName'][ind];
-            console.log('https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=1&explaintext=1&origin=*&titles=' + articleName);
+            var spacerockLabel = ds.data['spacerockLabel'][ind];
+            var namesakeLabel = ds.data['namesakeLabel'][ind];
             fetch('https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=1&explaintext=1&origin=*&titles=' + articleName)
                 .then(function(response) {
                     return response.json();
@@ -128,9 +129,13 @@ callback_datapoint_select = CustomJS(
                 .then(function (text) {
                     var regex = /\\(.*? (is|was)/;
                     var cleaned_text = text.replace(regex, '$1');
-                    var shortened_text = cleaned_text.substring(0, 500);
+                    var shortened_text = cleaned_text.substring(0, 400);
                     shortened_text = shortened_text.substring(0, shortened_text.lastIndexOf('.') + 1);
-                    details.text = shortened_text;
+                    var html = `<p><b>${spacerockLabel.replace(/\\s/g, '&nbsp;')}</b>
+                                named&nbsp;after <b>${namesakeLabel.replace(/\\s/g, '&nbsp;')}</b></p>
+                                <p>${shortened_text}</p><p>Source: Wikipedia.
+                                <a href="https://en.wikipedia.org/wiki/${articleName}" target=new>Read more...</a></p>`;
+                    details.text = html;
                 });
         }
         else {
