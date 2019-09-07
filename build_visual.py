@@ -1,9 +1,15 @@
+#
+## TODO:
+#       2. Add a graph of occupations that is filterable similar to other graphs
+#       3. Add context and title
+
 from bokeh.plotting import figure, output_file, save
 from bokeh.models import Select, TextInput, Button, ColumnDataSource, CustomJS, LabelSet, Div
 from bokeh.layouts import column, row
 output_file('visual.html')
 
 import pandas as pd
+import requests
 
 df = pd.read_csv('data.csv', index_col=0)
 edit_counts = pd.read_csv('edit_counts.csv', index_col=0)
@@ -145,4 +151,82 @@ callback_datapoint_select = CustomJS(
 
 ds.selected.js_on_change('indices', callback_datapoint_select)
 
-save(row(column(ti, s, reset_button, gender_header, gender_plot), p, details))
+# Special groups select
+
+def run_wikidata_query(q):
+    url = 'https://query.wikidata.org/sparql'
+    r = requests.get(url, params = {'format': 'json', 'query': q})
+    data = r.json()
+    var = data['head']['vars'][0]
+    return list(map(
+        lambda x: x[var]['value'],
+        data['results']['bindings']))
+
+
+special_groups_queries = {
+    'Apollo 11 Crew': """
+        select ?entity
+        where {
+          ?entity wdt:P5096 wd:Q43653.
+          service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+        }""",
+    'The Beatles': """
+        select ?entity
+        where {
+          ?entity p:P361 ?band.
+          ?entity wdt:P31 wd:Q5.
+          ?band ps:P361 wd:Q1299;
+                pq:P580 ?startTime;
+                pq:P582 ?endTime.
+          filter (year(?endTime) > 1963).
+          service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+        }""",
+    'Nobel laureates': """
+        select ?entity
+        where {
+          ?entity wdt:P166 ?award.
+          ?award wdt:P31 wd:Q7191.
+          service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+        }""",
+    'Roman emperors': """
+        select ?entity
+        where {
+          ?entity wdt:P39 wd:Q842606.
+          service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+        }""",
+    'US Presidents': """
+        select ?entity
+        where {
+          ?entity wdt:P39 wd:Q11696.
+          service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+        }""",
+}
+
+special_groups_members = {'Select...': []}
+special_groups_members.update({
+    k: run_wikidata_query(q) for k, q in special_groups_queries.items()})
+
+
+
+special_groups_sel = Select(options=list(special_groups_members), title="Select to view a special group of people",)
+
+cb_select_group = CustomJS(args=dict(ds=ds, special_groups_members=special_groups_members), code="""
+    console.log("kuken");
+    var namesakes = ds.data['namesake'];
+    var selected_group = cb_obj.value;
+    var selected_namesakes = special_groups_members[selected_group];
+    console.log(selected_namesakes);
+    console.log(namesakes);
+    var ind = [];
+    for (var i = 0; i < selected_namesakes.length; ++i) {
+        ind = ind.concat(namesakes
+              .map((n, j) => n === selected_namesakes[i] ? j : -1)
+              .filter(index => index !== -1));
+        console.log(ind);
+    }
+    ds.selected.indices = ind;
+""")
+
+special_groups_sel.js_on_change('value', cb_select_group)
+
+save(row(column(ti, s, reset_button, gender_header, gender_plot, special_groups_sel), p, details))
