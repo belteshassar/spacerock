@@ -48,10 +48,9 @@ def query_wikidata():
     spacerocks = []
     for item in data['results']['bindings']:
         spacerocks.append({
-            'spacerock': item['spacerock']['value'],
             'spacerockLabel': item['spacerockLabel']['value'],
             'avgMagnitude': item['avgMagnitude']['value'],
-            'namesake': item['namesake']['value'],
+            'namesake': item['namesake']['value'].replace('http://www.wikidata.org/entity/', ''),
             'namesakeLabel': item['namesakeLabel']['value'],
             'namesakeGender': item['genderLabel']['value']
                 if 'genderLabel' in item else None,

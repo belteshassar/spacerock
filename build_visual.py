@@ -168,7 +168,7 @@ def run_wikidata_query(q):
     data = r.json()
     var = data['head']['vars'][0]
     return list(map(
-        lambda x: x[var]['value'],
+        lambda x: x[var]['value'].replace('http://www.wikidata.org/entity/', ''),
         data['results']['bindings']))
 
 
