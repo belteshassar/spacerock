@@ -228,6 +228,16 @@ special_groups_queries = {
           ?namesake wdt:P106 wd:Q11774891.
           service wikibase:label { bd:serviceParam wikibase:language "[auto_language],en". }
         }""",
+    'Monarchs': """
+        select ?namesake
+        where
+        {
+          ?spacerock wdt:P138 ?namesake.
+          ?namesake wdt:P31 wd:Q5.
+          ?spacerock wdt:P31 wd:Q3863.
+          ?namesake wdt:P39/wdt:P279* wd:Q116.
+          service wikibase:label { bd:serviceParam wikibase:language "[auto_language],en". }
+        }""",
     'Musicians': """
         select ?namesake ?namesakeLabel
         where
