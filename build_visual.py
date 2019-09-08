@@ -121,7 +121,7 @@ callback_datapoint_select = CustomJS(
             var articleName = ds.data['articleName'][ind];
             var spacerockLabel = ds.data['spacerockLabel'][ind];
             var namesakeLabel = ds.data['namesakeLabel'][ind];
-            fetch('https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro=1&explaintext=1&origin=*&titles=' + articleName)
+            fetch('https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts|pageimages&exintro=1&explaintext=1&pithumbsize=250&origin=*&titles=' + articleName)
                 .then(function(response) {
                     return response.json();
                 })
@@ -129,15 +129,26 @@ callback_datapoint_select = CustomJS(
                     return myJson['query']['pages'];
                 })
                 .then(function(pages) {
-                    return pages[Object.keys(pages)[0]]['extract'].split('\\n')[0];
+                    var page = pages[Object.keys(pages)[0]];
+                    var pageInfo = {'text': page['extract'].split('\\n')[0]};
+                    if (page['thumbnail']) {
+                        pageInfo['img'] = page['thumbnail']['source'];
+                    }
+                    return pageInfo;
+                    /*return pages[Object.keys(pages)[0]]['extract'].split('\\n')[0];*/
                 })
-                .then(function (text) {
+                .then(function (page) {
                     var regex = /\\(.*? (is|was)/;
-                    var cleaned_text = text.replace(regex, '$1');
+                    var cleaned_text = page.text.replace(regex, '$1');
                     var shortened_text = cleaned_text.substring(0, 400);
                     shortened_text = shortened_text.substring(0, shortened_text.lastIndexOf('.') + 1);
+                    var imgTag = '';
+                    if (page.img) {
+                        imgTag = `<img width=250 src=${page.img} />`;
+                    }
                     var html = `<p><b>${spacerockLabel.replace(/\\s/g, '&nbsp;')}</b>
                                 named&nbsp;after <b>${namesakeLabel.replace(/\\s/g, '&nbsp;')}</b></p>
+                                ${imgTag}
                                 <p>${shortened_text}</p><p>Source: Wikipedia.
                                 <a href="https://en.wikipedia.org/wiki/${articleName}" target=new>Read more...</a></p>`;
                     details.text = html;
