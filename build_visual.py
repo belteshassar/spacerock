@@ -5,7 +5,7 @@
 from bokeh.plotting import figure, output_file, save
 from bokeh.models import Select, TextInput, Button, ColumnDataSource, CustomJS, LabelSet, Div
 from bokeh.layouts import column, row
-output_file('visual.html')
+output_file('visual.html', title='Spacerocks and the (more or less) famous people lending their names to them')
 
 import pandas as pd
 import requests
@@ -296,4 +296,47 @@ cb_select_group = CustomJS(args=dict(ds=ds, special_groups_members=special_group
 
 special_groups_sel.js_on_change('value', cb_select_group)
 
-save(row(column(ti, s, reset_button, gender_header, gender_plot, special_groups_sel), p, details))
+title_block = Div(text="""
+    <h2>Spacerocks and the (more or less) famous people lending their names to them</h2>
+    <p>This visualization was created to explore if larger asteroids are named
+    after more famous people. Please use the interactive elements to explore this
+    odd collection of people or read more about how and why I made this below.</p>
+""")
+
+intro_block = Div(text="""
+    <p>When it was announced that Scott Manley would get to lend his name to them
+    asteroid 33434 Scottmanley he tweeted a <a href="https://twitter.com/DJSnM/status/1132087769973440512" target=new>
+    series of tweets</a> claiming that there seems to be no correlation between
+    fame and the size of the spacerock bearing your name. I wanted to explore this
+    further so I created this visualization.</p>
+
+    <p>Asteroid size is typically measured as absolute magnitude. This is a
+    logarithmic scale and has the odd property that a larger asteroid has a
+    smaller number. Fame is much harder to measure. Manley suggested to plot
+    magnitude vs record sales, but it seems unnecessarily restrictive to only
+    include musicians in the comparison. Instead I turned to the literature and
+    found that the <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6034871/" target=new>
+    number of edits to a person's Wikipedia article seems to correlate well with
+    reconition</a>. Bingo, that was the measure I needed!</p>
+
+    <p>The visualization was made using the <a href="https://bokeh.pydata.org" target=new>
+    Bokeh library</a>. Most of the data comes from <a href="https://www.wikidata.org/" target=new>
+    Wikidata</a>, except edit counts that were downloaded using the
+    <a href="https://xtools.readthedocs.io/en/stable/api/index.html" target=new>
+    Xtools API</a>.</p>
+""")
+
+filter_header = Div(text="<b>Use filters to explore</b>",)
+details_header = Div(text="<b>Details</b>",)
+
+save(
+    column(
+        title_block,
+        row(
+            column(filter_header, ti, s, reset_button, special_groups_sel, gender_header, gender_plot),
+            p,
+            column(details_header, details),
+        ),
+        intro_block,
+    )
+)
