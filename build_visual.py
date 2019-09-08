@@ -131,7 +131,6 @@ callback_datapoint_select = CustomJS(
                         pageInfo['img'] = page['thumbnail']['source'];
                     }
                     return pageInfo;
-                    /*return pages[Object.keys(pages)[0]]['extract'].split('\\n')[0];*/
                 })
                 .then(function (page) {
                     var regex = /\\(.*? (is|was)/;
