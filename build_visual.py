@@ -1,7 +1,8 @@
 #
 ## TODO:
 #       2. Add a graph of occupations that is filterable similar to other graphs
-#       3. Add context and title
+#       3. Add filterable graph of citizenship
+#       4. Add context and title
 
 from bokeh.plotting import figure, output_file, save
 from bokeh.models import Select, TextInput, Button, ColumnDataSource, CustomJS, LabelSet, Div
@@ -211,18 +212,14 @@ special_groups_members.update({
 special_groups_sel = Select(options=list(special_groups_members), title="Select to view a special group of people",)
 
 cb_select_group = CustomJS(args=dict(ds=ds, special_groups_members=special_groups_members), code="""
-    console.log("kuken");
     var namesakes = ds.data['namesake'];
     var selected_group = cb_obj.value;
     var selected_namesakes = special_groups_members[selected_group];
-    console.log(selected_namesakes);
-    console.log(namesakes);
     var ind = [];
     for (var i = 0; i < selected_namesakes.length; ++i) {
         ind = ind.concat(namesakes
               .map((n, j) => n === selected_namesakes[i] ? j : -1)
               .filter(index => index !== -1));
-        console.log(ind);
     }
     ds.selected.indices = ind;
 """)
