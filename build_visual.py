@@ -1,8 +1,6 @@
 #
 ## TODO:
-#       2. Add a graph of occupations that is filterable similar to other graphs
-#       3. Add filterable graph of citizenship
-#       4. Add context and title
+#       1. Add context and title
 
 from bokeh.plotting import figure, output_file, save
 from bokeh.models import Select, TextInput, Button, ColumnDataSource, CustomJS, LabelSet, Div
@@ -144,6 +142,9 @@ callback_datapoint_select = CustomJS(
                                 <a href="https://en.wikipedia.org/wiki/${articleName}" target=new>Read more...</a></p>`;
                     details.text = html;
                 });
+        }
+        else if (ind.length > 1) {
+            details.text = `<p>${ind.length} selected.</p><p>Select one datapoint to view details.</p>`;
         }
         else {
             details.text = details_placeholder;
