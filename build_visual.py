@@ -183,6 +183,24 @@ special_groups_queries = {
           ?entity wdt:P5096 wd:Q43653.
           service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
         }""",
+    'Astronauts': """
+        select ?namesake
+        where {
+          ?spacerock wdt:P138 ?namesake.
+          ?namesake wdt:P31 wd:Q5.
+          ?spacerock wdt:P31 wd:Q3863.
+          ?namesake wdt:P106 wd:Q11631.
+          SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+        }""",
+    'Baseball players': """
+        select ?namesake
+        where {
+          ?spacerock wdt:P138 ?namesake.
+          ?namesake wdt:P31 wd:Q5.
+          ?spacerock wdt:P31 wd:Q3863.
+          ?namesake wdt:P106 wd:Q10871364.
+          SERVICE wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+        }""",
     'The Beatles': """
         select ?entity
         where {
@@ -193,6 +211,36 @@ special_groups_queries = {
                 pq:P582 ?endTime.
           filter (year(?endTime) > 1963).
           service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+        }""",
+    'Chess Grandmasters': """
+        select ?namesake
+        where
+        {
+          ?spacerock wdt:P138 ?namesake.
+          ?namesake wdt:P31 wd:Q5.
+          ?spacerock wdt:P31 wd:Q3863.
+          ?namesake wdt:P2962 wd:Q105269.
+          service wikibase:label { bd:serviceParam wikibase:language "[auto_language],en". }
+        }""",
+    'Ice hockey players': """
+        select ?namesake ?namesakeLabel
+        where
+        {
+          ?spacerock wdt:P138 ?namesake.
+          ?namesake wdt:P31 wd:Q5.
+          ?spacerock wdt:P31 wd:Q3863.
+          ?namesake wdt:P106 wd:Q11774891.
+          service wikibase:label { bd:serviceParam wikibase:language "[auto_language],en". }
+        }""",
+    'Musicians': """
+        select ?namesake ?namesakeLabel
+        where
+        {
+          ?spacerock wdt:P138 ?namesake.
+          ?namesake wdt:P31 wd:Q5.
+          ?spacerock wdt:P31 wd:Q3863.
+          ?namesake wdt:P106 wd:Q639669.
+          service wikibase:label { bd:serviceParam wikibase:language "[auto_language],en". }
         }""",
     'Nobel laureates': """
         select ?entity
@@ -206,6 +254,16 @@ special_groups_queries = {
         where {
           ?entity wdt:P39 wd:Q842606.
           service wikibase:label { bd:serviceParam wikibase:language "[AUTO_LANGUAGE],en". }
+        }""",
+    'Samurai': """
+        select ?namesake
+        where
+        {
+          ?spacerock wdt:P138 ?namesake.
+          ?namesake wdt:P31 wd:Q5.
+          ?spacerock wdt:P31 wd:Q3863.
+          ?namesake wdt:P106 wd:Q38142.
+          service wikibase:label { bd:serviceParam wikibase:language "[auto_language],en". }
         }""",
     'US Presidents': """
         select ?entity
