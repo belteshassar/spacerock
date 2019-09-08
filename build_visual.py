@@ -1,7 +1,3 @@
-#
-## TODO:
-#       1. Add context and title
-
 from bokeh.plotting import figure, output_file, save
 from bokeh.models import Select, TextInput, Button, ColumnDataSource, CustomJS, LabelSet, Div
 from bokeh.layouts import column, row
