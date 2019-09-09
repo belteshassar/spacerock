@@ -25,7 +25,11 @@ WHERE
 GROUP BY ?spacerock ?spacerockLabel ?namesake ?namesakeLabel ?genderLabel ?articleName
 """
 
-edit_counts = pd.read_csv('edit_counts.csv', index_col=0)
+try:
+    edit_counts = pd.read_csv('edit_counts.csv', index_col=0)
+except FileNotFoundError:
+    edit_counts = pd.DataFrame()
+
 
 def get_num_wiki_edits(page, reload_cached=False):
     if not reload_cached:
