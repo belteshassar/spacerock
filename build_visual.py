@@ -328,7 +328,7 @@ intro_block = Div(text="""
     Bokeh library</a>. Most of the data comes from <a href="https://www.wikidata.org/" target=new>
     Wikidata</a>, except edit counts that were downloaded using the
     <a href="https://xtools.readthedocs.io/en/stable/api/index.html" target=new>
-    Xtools API</a>.</p>
+    Xtools API</a>. Edit counts are as of 2019-09-09</p>
 """)
 
 filter_header = Div(text="<b>Use filters to explore</b>",)
