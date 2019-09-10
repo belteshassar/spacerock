@@ -1,4 +1,4 @@
-#Famous people and the pieces of spacerock named after them
+# Famous people and the pieces of spacerock named after them
 
 This project contains the code needed to reproduce the analysis of famous
 people and the asteroids named after them. Data is pulled from *Wikidata* and
