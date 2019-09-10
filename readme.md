@@ -1,6 +1,13 @@
 # Famous people and the pieces of spacerock named after them
 
-This project contains the code needed to reproduce the analysis of famous
-people and the asteroids named after them. Data is pulled from *Wikidata* and
-from *Xtools* API. Visuals and interactive widgets are created using the
-*Bokeh* library.
+When it was announced that [Scott Manley](https://en.wikipedia.org/wiki/Scott_Manley) would get to lend his name to the asteroid *33434 Scottmanley*, he tweeted a series of tweets claiming that there seems to be no correlation between fame and the size of the spacerock bearing your name.
+
+<blockquote class="twitter-tweet"><p lang="en" dir="ltr">This seems a very XKCD observation - but degree of &#39;celebrity&#39; does not appear to be correlated with the sizes of asteroids named for people. For Crew of Apollo 11 - Michael Collins has the largest asteroid named for him. For the Beatles John Lennon gets the smallest.</p>&mdash; Scott Manley (@DJSnM) <a href="https://twitter.com/DJSnM/status/1132087769973440512?ref_src=twsrc%5Etfw">May 25, 2019</a></blockquote>
+
+I wanted to explore this further so I decided to create the visualization that Manley called for. The visualization was made using the [Bokeh library](https://bokeh.pydata.org/). Most of the data comes from [Wikidata](https://www.wikidata.org/), except edit counts that were downloaded using the [Xtools API](https://xtools.readthedocs.io/en/stable/api/). Wikidata is a great source for these kinds of links between unrelated domains of knowledge. From the same datasource it is easy to pull both the data about heavenly bodies as well as information about whatever person or object the name comes from.
+
+Asteroid size (or luminosity to be precise) is typically measured as [absolute magnitude](https://en.wikipedia.org/wiki/Absolute_magnitude) *M*. This is a logarithmic scale and has the odd property that a larger asteroid has a smaller number. A difference of 5 in absolute magnitude corresponds to 100 fold difference in luminosity.
+
+Fame is much harder to measure. Manley suggested to plot magnitude vs record sales, but it seems unnecessarily restrictive to only include musicians in the comparison. Instead I turned to the literature and found that the number of edits to a person's Wikipedia article [seems to correlate well with name recognition](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6034871/). Bingo, that was the measure I needed! It turns out there are about 4000 asteroids named after real people, of which about 3600 are famous enough to warrant their own page on the English Wikipedia, so I had a pretty good sample to work with.
+
+All in all I think Manley's original hunch was correct. There is indeed no correlation between notoriety and the size of the asteroid bearing your name, but it was really fun to explore. If you've managed to read this far, I urge you to take a look at the [interactive chart](http://deriksson.se/spacerock/) or the [code](https://github.com/belteshassar/spacerock) available on Github.
